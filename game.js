@@ -29,7 +29,7 @@ var session = {
 init();
 database.ref().on("value", function(snapshot) {
     var session = snapshot.val();
-    console.log(session);
+    console.log("firebase object: " + session);
 
     document.querySelector(".btn-roll").addEventListener("click", function() {
         if (session.gamePlaying) {
