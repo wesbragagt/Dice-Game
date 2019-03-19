@@ -26,7 +26,6 @@ var session = {
     activePlayer: 0,
     gamePlaying: true
 };
-
 init();
 
 document.querySelector(".btn-roll").addEventListener("click", function() {
