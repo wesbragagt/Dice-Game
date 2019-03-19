@@ -28,12 +28,6 @@ var session = {
 };
 init();
 
-// reference data in firebase
-database.ref().on("value", function(snapshot) {
-    var session = snapshot.val();
-    console.log(session);
-});
-
 document.querySelector(".btn-roll").addEventListener("click", function() {
     if (session.gamePlaying) {
         // Random Number
@@ -97,7 +91,7 @@ document.querySelector(".btn-new").addEventListener("click", init);
 
 function nextPlayer() {
     //Next Player's turn reset the roundScore
-
+    database.ref().set(session);
     // reset round score to 0
     session.roundScore = 0;
     document.querySelector("#current-" + session.activePlayer).textContent =
@@ -150,3 +144,22 @@ function init() {
 
     database.ref().set(session);
 }
+
+// reference data in firebase
+database.ref().on("value", function(snapshot) {
+    var session = snapshot.val();
+
+    // display the dice roll number
+    document.querySelector(".dice").src =
+        "assets/images/dice-" + session.diceRoll + ".png";
+
+    document.querySelector(".dice").style.display = "block";
+
+    // display current round score
+    document.querySelector("#current-" + session.activePlayer).textContent =
+        session.roundScore;
+
+    // display global player score
+    document.querySelector("#score-" + session.activePlayer).textContent =
+        session.gScore[session.activePlayer];
+});
