@@ -27,7 +27,6 @@ var session = {
     gamePlaying: true
 };
 init();
-
 document.querySelector(".btn-roll").addEventListener("click", function() {
     if (session.gamePlaying) {
         // Random Number
