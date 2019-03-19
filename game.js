@@ -27,7 +27,6 @@ var session = {
     gamePlaying: true
 };
 init();
-
 database.ref().on("value", function(snapshot) {
     var session = snapshot.val();
     console.log(session);
