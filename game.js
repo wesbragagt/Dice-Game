@@ -27,67 +27,72 @@ var session = {
     gamePlaying: true
 };
 init();
+database.ref().on("value", function(snapshot) {
+    var session = snapshot.val();
+    console.log(session);
 
-document.querySelector(".btn-roll").addEventListener("click", function() {
-    if (session.gamePlaying) {
-        // Random Number
-        session.diceRoll = Math.floor(Math.random() * 6) + 1;
+    document.querySelector(".btn-roll").addEventListener("click", function() {
+        if (session.gamePlaying) {
+            // Random Number
+            session.diceRoll = Math.floor(Math.random() * 6) + 1;
 
-        // on click display the dice roll number
-        document.querySelector(".dice").src =
-            "assets/images/dice-" + session.diceRoll + ".png";
+            // on click display the dice roll number
+            document.querySelector(".dice").src =
+                "assets/images/dice-" + session.diceRoll + ".png";
 
-        document.querySelector(".dice").style.display = "block";
+            document.querySelector(".dice").style.display = "block";
 
-        if (session.diceRoll !== 1) {
-            // add score
-            session.roundScore += session.diceRoll;
-            document.querySelector(
-                "#current-" + session.activePlayer
-            ).textContent = session.roundScore;
-        } else {
-            alert("You rolled 1, next player");
-            nextPlayer();
+            if (session.diceRoll !== 1) {
+                // add score
+                session.roundScore += session.diceRoll;
+                document.querySelector(
+                    "#current-" + session.activePlayer
+                ).textContent = session.roundScore;
+            } else {
+                alert("You rolled 1, next player");
+                nextPlayer();
+            }
+
+            // updating info on firebase
+            database.ref().set(session);
         }
+    });
 
-        // updating info on firebase
+    document.querySelector(".btn-hold").addEventListener("click", function() {
+        if (session.gamePlaying) {
+            // add current score to global score
+            session.gScore[session.activePlayer] += session.roundScore;
+            //update the UI
+            document.querySelector(
+                "#score-" + session.activePlayer
+            ).textContent = session.gScore[session.activePlayer];
+
+            // check if the player won the game
+            if (session.gScore[session.activePlayer] >= 10) {
+                document.querySelector(
+                    "#name-" + session.activePlayer
+                ).textContent = "Winner!";
+
+                document.querySelector(".dice").style.display = "none";
+
+                document
+                    .querySelector(".player-" + session.activePlayer + "-panel")
+                    .classList.add("winner");
+                document
+                    .querySelector(".player-" + session.activePlayer + "-panel")
+                    .classList.remove("active");
+
+                session.gamePlaying = false;
+            } else {
+                // change player after hold being pressed
+                nextPlayer();
+            }
+        }
         database.ref().set(session);
-    }
+    });
+
+    document.querySelector(".btn-new").addEventListener("click", init);
 });
-
-document.querySelector(".btn-hold").addEventListener("click", function() {
-    if (session.gamePlaying) {
-        // add current score to global score
-        session.gScore[session.activePlayer] += session.roundScore;
-        //update the UI
-        document.querySelector("#score-" + session.activePlayer).textContent =
-            session.gScore[session.activePlayer];
-
-        // check if the player won the game
-        if (session.gScore[session.activePlayer] >= 10) {
-            document.querySelector(
-                "#name-" + session.activePlayer
-            ).textContent = "Winner!";
-
-            document.querySelector(".dice").style.display = "none";
-
-            document
-                .querySelector(".player-" + session.activePlayer + "-panel")
-                .classList.add("winner");
-            document
-                .querySelector(".player-" + session.activePlayer + "-panel")
-                .classList.remove("active");
-
-            session.gamePlaying = false;
-        } else {
-            // change player after hold being pressed
-            nextPlayer();
-        }
-    }
-    database.ref().set(session);
-});
-
-document.querySelector(".btn-new").addEventListener("click", init);
 
 function nextPlayer() {
     //Next Player's turn reset the roundScore
