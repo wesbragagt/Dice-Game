@@ -27,6 +27,7 @@ var session = {
     gamePlaying: true
 };
 init();
+<<<<<<< HEAD
 database.ref().on("value", function(snapshot) {
     var session = snapshot.val();
     console.log(session);
@@ -63,6 +64,22 @@ database.ref().on("value", function(snapshot) {
             // add current score to global score
             session.gScore[session.activePlayer] += session.roundScore;
             //update the UI
+=======
+document.querySelector(".btn-roll").addEventListener("click", function() {
+    if (session.gamePlaying) {
+        // Random Number
+        session.diceRoll = Math.floor(Math.random() * 6) + 1;
+
+        // on click display the dice roll number
+        document.querySelector(".dice").src =
+            "assets/images/dice-" + session.diceRoll + ".png";
+
+        document.querySelector(".dice").style.display = "block";
+
+        if (session.diceRoll !== 1) {
+            // add score
+            session.roundScore += session.diceRoll;
+>>>>>>> 7f3d413d8ebdb0e6a843eb2c754262162d3ced8e
             document.querySelector(
                 "#score-" + session.activePlayer
             ).textContent = session.gScore[session.activePlayer];
