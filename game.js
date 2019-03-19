@@ -27,12 +27,9 @@ var session = {
     gamePlaying: true
 };
 
-$(document).ready(function() {
-    //document loads it sets the object on firebase
-    init();
-});
+init();
 
-$(".btn-roll").on("click", function() {
+document.querySelector(".btn-roll").addEventListener("click", function() {
     if (session.gamePlaying) {
         // Random Number
         session.diceRoll = Math.floor(Math.random() * 6) + 1;
