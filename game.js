@@ -29,7 +29,7 @@ var session = {
 
 $(document).ready(function() {
     //document loads it sets the object on firebase
-    database.ref().set(session);
+    init();
 });
 
 $(".btn-roll").on("click", function() {
@@ -56,6 +56,8 @@ $(".btn-roll").on("click", function() {
     database.ref().set(session);
 });
 
+document.querySelector(".btn-new").addEventListener("click", init);
+
 function nextPlayer() {
     //Next Player's turn reset the roundScore
 
@@ -78,4 +80,36 @@ function nextPlayer() {
 
     // then make sure the dice is hidden when the next player starts
     document.querySelector(".dice").style.display = "none";
+}
+
+function init() {
+    session.diceRoll = 0;
+    session.gScore = [0, 0];
+    session.roundScore = 0;
+    session.activePlayer = 0;
+    session.gamePlaying = true;
+
+    // when page load do not display the dice
+    document.querySelector(".dice").style.display = "none";
+
+    document.getElementById("score-0").textContent = "0";
+    document.getElementById("score-1").textContent = "0";
+
+    document.getElementById("current-0").textContent = "0";
+    document.getElementById("current-1").textContent = "0";
+
+    document.getElementById("name-0").textContent = "Player 1";
+    document.getElementById("name-1").textContent = "Player 2";
+
+    document.querySelector(".player-0-panel").classList.remove("winner");
+    document.querySelector(".player-1-panel").classList.remove("winner");
+
+    document
+        .querySelector(".player-" + session.activePlayer + "-panel")
+        .classList.remove("active");
+    document
+        .querySelector(".player-" + session.activePlayer + "-panel")
+        .classList.add("active");
+
+    database.ref().set(session);
 }
