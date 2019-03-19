@@ -28,7 +28,7 @@ var session = {
 };
 init();
 
-// reference data in firebase
+// reference data in firebase to populate the page
 database.ref().on("value", function(snapshot) {
     var session = snapshot.val();
     console.log(session);
