@@ -26,72 +26,57 @@ var session = {
     activePlayer: 0,
     gamePlaying: true
 };
-init();
 
+// button roll will update firebase with real time info
 document.querySelector(".btn-roll").addEventListener("click", function() {
     if (session.gamePlaying) {
         // Random Number
         session.diceRoll = Math.floor(Math.random() * 6) + 1;
 
-        // on click display the dice roll number
-        document.querySelector(".dice").src =
-            "assets/images/dice-" + session.diceRoll + ".png";
-
-        document.querySelector(".dice").style.display = "block";
-
         if (session.diceRoll !== 1) {
             // add score
             session.roundScore += session.diceRoll;
-            document.querySelector(
-                "#current-" + session.activePlayer
-            ).textContent = session.roundScore;
-        } else {
-            alert("You rolled 1, next player");
-            nextPlayer();
-        }
+            // document.querySelector(
+            //     "#current-" + session.activePlayer
+            // ).textContent = session.roundScore;
 
-        // updating info on firebase
-        database.ref().set(session);
+            // updating info on firebase
+            database.ref().set(session);
+        } else {
+            // updating info on firebase
+            database.ref().set(session);
+        }
     }
 });
 
-document.querySelector(".btn-hold").addEventListener("click", function() {
+// reference data in firebase
+database.ref().on("value", function(snapshot) {
+    var session = snapshot.val();
+    console.log(session);
+
     if (session.gamePlaying) {
-        // add current score to global score
-        session.gScore[session.activePlayer] += session.roundScore;
-        //update the UI
-        document.querySelector("#score-" + session.activePlayer).textContent =
-            session.gScore[session.activePlayer];
+        document.querySelector(".dice").style.display = "block";
+        document.querySelector(".dice").src =
+            "assets/images/dice-" + session.diceRoll + ".png";
 
-        // check if the player won the game
-        if (session.gScore[session.activePlayer] >= 10) {
-            document.querySelector(
-                "#name-" + session.activePlayer
-            ).textContent = "Winner!";
+        document.querySelector("#current-" + session.activePlayer).textContent =
+            session.roundScore;
 
-            document.querySelector(".dice").style.display = "none";
-
-            document
-                .querySelector(".player-" + session.activePlayer + "-panel")
-                .classList.add("winner");
-            document
-                .querySelector(".player-" + session.activePlayer + "-panel")
-                .classList.remove("active");
-
-            session.gamePlaying = false;
-        } else {
-            // change player after hold being pressed
+        if (session.diceRoll === 1) {
+            alert(
+                "player " +
+                    (session.activePlayer + 1) +
+                    "rolled " +
+                    session.diceRoll
+            );
             nextPlayer();
         }
     }
-    database.ref().set(session);
 });
-
-document.querySelector(".btn-new").addEventListener("click", init);
 
 function nextPlayer() {
     //Next Player's turn reset the roundScore
-    database.ref().set(session);
+
     // reset round score to 0
     session.roundScore = 0;
     document.querySelector("#current-" + session.activePlayer).textContent =
@@ -104,6 +89,9 @@ function nextPlayer() {
         ? (session.activePlayer = 1)
         : (session.activePlayer = 0);
 
+    database.ref().set(session.roundScore);
+    database.ref().set(session.activePlayer);
+
     // change players according to the activePlayer
     // toggle method checks to see if active class exists if it does it will remove it, if it doesn't it will create it.
     document.querySelector(".player-0-panel").classList.toggle("active");
@@ -112,54 +100,3 @@ function nextPlayer() {
     // then make sure the dice is hidden when the next player starts
     document.querySelector(".dice").style.display = "none";
 }
-
-function init() {
-    session.diceRoll = 0;
-    session.gScore = [0, 0];
-    session.roundScore = 0;
-    session.activePlayer = 0;
-    session.gamePlaying = true;
-
-    // when page load do not display the dice
-    document.querySelector(".dice").style.display = "none";
-
-    document.getElementById("score-0").textContent = "0";
-    document.getElementById("score-1").textContent = "0";
-
-    document.getElementById("current-0").textContent = "0";
-    document.getElementById("current-1").textContent = "0";
-
-    document.getElementById("name-0").textContent = "Player 1";
-    document.getElementById("name-1").textContent = "Player 2";
-
-    document.querySelector(".player-0-panel").classList.remove("winner");
-    document.querySelector(".player-1-panel").classList.remove("winner");
-
-    document
-        .querySelector(".player-" + session.activePlayer + "-panel")
-        .classList.remove("active");
-    document
-        .querySelector(".player-" + session.activePlayer + "-panel")
-        .classList.add("active");
-
-    database.ref().set(session);
-}
-
-// reference data in firebase
-database.ref().on("value", function(snapshot) {
-    var session = snapshot.val();
-
-    // display the dice roll number
-    document.querySelector(".dice").src =
-        "assets/images/dice-" + session.diceRoll + ".png";
-
-    document.querySelector(".dice").style.display = "block";
-
-    // display current round score
-    document.querySelector("#current-" + session.activePlayer).textContent =
-        session.roundScore;
-
-    // display global player score
-    document.querySelector("#score-" + session.activePlayer).textContent =
-        session.gScore[session.activePlayer];
-});
